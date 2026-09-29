@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BuildTrack — Construction Management</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f5f7fb;
+      color: #172033;
+    }
+
+    header {
+      height: 72px;
+      background: white;
+      border-bottom: 1px solid #e5e9f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 11px;
+      background: #111827;
+      color: white;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+    }
+
+    .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #e9edf3;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+    }
+
+    main {
+      max-width: 1180px;
+      margin: auto;
+      padding: 34px 22px;
+    }
+
+    .welcome {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+
+    h1 {
+      margin: 0 0 7px;
+      font-size: 32px;
+    }
+
+    .sub {
+      color: #687386;
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 12px 17px;
+      background: #111827;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #e5e9f0;
+      border-radius: 15px;
+      padding: 20px;
+    }
+
+    .label {
+      color: #687386;
+      font-size: 13px;
+    }
+
+    .value {
+      font-size: 26px;
+      font-weight: 800;
+      margin-top: 8px;
+    }
+
+    .green {
+      color: #159570;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 19px;
+    }
+
+    .project {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 18px 0;
+      border-bottom: 1px solid #e5e9f0;
+    }
+
+    .project:last-child {
+      border-bottom: 0;
+    }
+
+    .project h3 {
+      margin: 7px 0 6px;
+    }
+
+    .meta {
+      color: #687386;
+      font-size: 13px;
+    }
+
+    .progress {
+      height: 8px;
+      background: #edf0f4;
+      border-radius: 10px;
+      margin-top: 14px;
+      overflow: hidden;
+    }
+
+    .bar {
+      height: 100%;
+      background: #f59e0b;
+      border-radius: 10px;
+    }
+
+    .money {
+      font-weight: 800;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 20px;
+      background: #fff4db;
+      color: #a15d00;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    @media (max-width: 760px) {
+      header {
+        padding: 0 16px;
+      }
+
+      main {
+        padding: 24px 15px;
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .welcome {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      h1 {
+        font-size: 27px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="brand">
+    <div class="logo">B</div>
+    BuildTrack
+  </div>
+
+  <div class="avatar">HS</div>
+</header>
+
+<main>
+
+  <section class="welcome">
+
+    <div>
+      <h1>Good morning 👋</h1>
+
+      <div class="sub">
+        Here's what's happening across your construction projects.
+      </div>
+    </div>
+
+    <button onclick="alert('Project creation will be added next.')">
+      + New Project
+    </button>
+
+  </section>
+
+  <section class="stats">
+
+    <div class="card">
+      <div class="label">Active Projects</div>
+      <div class="value">3</div>
+    </div>
+
+    <div class="card">
+      <div class="label">Contract Value</div>
+      <div class="value">₹12.8L</div>
+    </div>
+
+    <div class="card">
+      <div class="label">Total Spent</div>
+      <div class="value">₹7.4L</div>
+    </div>
+
+    <div class="card">
+      <div class="label">Remaining</div>
+      <div class="value green">₹5.4L</div>
+    </div>
+
+  </section>
+
+  <section class="grid">
+
+    <div class="card">
+
+      <h2>Active Projects</h2>
+
+      <div class="project">
+
+        <div>
+          <span class="tag">In progress</span>
+
+          <h3>PCC Road Project</h3>
+
+          <div class="meta">
+            Ghatsila • Due 18 Oct 2026
+          </div>
+
+          <div class="progress">
+            <div class="bar" style="width:68%"></div>
+          </div>
+        </div>
+
+        <div class="money">68%</div>
+
+      </div>
+
+
+      <div class="project">
+
+        <div>
+          <span class="tag">In progress</span>
+
+          <h3>Residential Building</h3>
+
+          <div class="meta">
+            Jamshedpur • Due 12 Dec 2026
+          </div>
+
+          <div class="progress">
+            <div class="bar" style="width:42%"></div>
+          </div>
+        </div>
+
+        <div class="money">42%</div>
+
+      </div>
+
+
+      <div class="project">
+
+        <div>
+          <span class="tag">Planning</span>
+
+          <h3>Shop Renovation</h3>
+
+          <div class="meta">
+            Ghatsila • Due 02 Nov 2026
+          </div>
+
+          <div class="progress">
+            <div class="bar" style="width:15%"></div>
+          </div>
+        </div>
+
+        <div class="money">15%</div>
+
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <h2>Recent Expenses</h2>
+
+      <div class="project">
+
+        <div>
+          <h3>Cement</h3>
+          <div class="meta">PCC Road • Today</div>
+        </div>
+
+        <div class="money">₹18,400</div>
+
+      </div>
+
+
+      <div class="project">
+
+        <div>
+          <h3>Labour</h3>
+          <div class="meta">Residential • Yesterday</div>
+        </div>
+
+        <div class="money">₹9,200</div>
+
+      </div>
+
+
+      <div class="project">
+
+        <div>
+          <h3>Transport</h3>
+          <div class="meta">PCC Road • 27 Sep</div>
+        </div>
+
+        <div class="money">₹4,500</div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+</body>
+</html>
