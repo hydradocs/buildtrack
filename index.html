@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>BuildTrack — Construction Management</title>
 <style>
-*{box-sizing:border-box}:root{--bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#687386;--border:#e5e9f0;--dark:#111827;--green:#159570;--orange:#f59e0b}
+*{box-sizing:border-box} :root{--bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#687386;--border:#e5e9f0;--dark:#111827;--green:#159570;--orange:#f59e0b}
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
 header{height:72px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:10}.brand{display:flex;align-items:center;gap:12px;font-size:20px;font-weight:800}.logo{width:38px;height:38px;border-radius:11px;background:var(--dark);color:#fff;display:grid;place-items:center;font-weight:800}.avatar{width:38px;height:38px;border-radius:50%;background:#e9edf3;display:grid;place-items:center;font-weight:700}
 main{max-width:1180px;margin:auto;padding:34px 22px 60px}.welcome{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:28px}h1{margin:0 0 7px;font-size:32px}h2{margin:0 0 15px;font-size:19px}h3{margin:7px 0 6px}.sub,.meta{color:var(--muted)}button{border:0;border-radius:10px;padding:12px 17px;background:var(--dark);color:#fff;font-weight:700;cursor:pointer}button.secondary{background:#edf1f6;color:var(--text)}button.success{background:var(--green)}
@@ -43,13 +43,13 @@ function useExample(t){document.getElementById('aiInput').value=t;document.getEl
 function showError(t){const e=document.getElementById('errorBox');e.textContent=t;e.classList.add('show')}
 function clearError(){document.getElementById('errorBox').classList.remove('show')}
 
-/* Robust Indian currency parser. ₹18,000 becomes numeric 18000, never 18000000. */
+/* FIXED: the k/lakh suffix now requires a word boundary, so Hindi "ka" cannot turn 18,000 into 18,000,000. */
 function extractMoney(text){
  const out=[];
- const re=/₹\s*([0-9]+(?:,[0-9]{2,3})*(?:\.[0-9]+)?)(?:\s*(lakh|lac|k))?/gi;
+ const re=/₹\s*([0-9]+(?:,[0-9]{2,3})*(?:\.[0-9]+)?)(?:\s*(lakh|lac|k)\b)?/gi;
  let m;
  while((m=re.exec(text))){let v=Number(m[1].replace(/,/g,''));const unit=(m[2]||'').toLowerCase();if(unit==='lakh'||unit==='lac')v*=100000;else if(unit==='k')v*=1000;out.push({value:v,index:m.index,end:re.lastIndex})}
- const rs=/\brs\.?\s*([0-9]+(?:,[0-9]{2,3})*(?:\.[0-9]+)?)(?:\s*(lakh|lac|k))?/gi;
+ const rs=/\brs\.?\s*([0-9]+(?:,[0-9]{2,3})*(?:\.[0-9]+)?)(?:\s*(lakh|lac|k)\b)?/gi;
  while((m=rs.exec(text))){let v=Number(m[1].replace(/,/g,''));const unit=(m[2]||'').toLowerCase();if(unit==='lakh'||unit==='lac')v*=100000;else if(unit==='k')v*=1000;out.push({value:v,index:m.index,end:rs.lastIndex})}
  return out.sort((a,b)=>a.index-b.index);
 }
@@ -59,24 +59,25 @@ function parseEntry(){
  clearError();const raw=document.getElementById('aiInput').value.trim();if(!raw){showError('Please describe your site activity first.');return}
  const text=raw.toLowerCase().replace(/\s+/g,' '),money=extractMoney(raw),r=[];const has=(...a)=>a.some(x=>text.includes(x));
  if(has('cement','सीमेंट')){const q=qty(text,['bags?','sacks?']);r.push({category:'Material',name:'Cement',quantity:q,unit:q!==null?'bags':'',amount:money[0]?.value||0})}
- if(has('sand','balu','baloo','बालू')){const i=Math.max(text.indexOf('sand'),text.indexOf('balu'),text.indexOf('baloo'));const q=qty(text,['trolleys?','trucks?','tons?','ton']);r.push({category:'Material',name:'Sand',quantity:q,unit:q!==null?'trolley':'',amount:amountAfter(money,i)})}
+ if(has('sand','balu','baloo','बालू')){const i=['sand','balu','baloo','बालू'].map(x=>text.indexOf(x)).filter(x=>x>=0)[0];const q=qty(text,['trolleys?','trucks?','tons?','ton']);r.push({category:'Material',name:'Sand',quantity:q,unit:q!==null?'trolley':'',amount:amountAfter(money,i)})}
  if(has('aggregate','gitti','stone','metal')){const i=['aggregate','gitti','stone','metal'].map(x=>text.indexOf(x)).filter(x=>x>=0)[0];const q=qty(text,['trolleys?','trucks?','tons?','ton']);r.push({category:'Material',name:'Aggregate',quantity:q,unit:q!==null?'trolley':'',amount:amountAfter(money,i)})}
  if(has('steel','saria','rebar','सरिया')){const i=['steel','saria','rebar','सरिया'].map(x=>text.indexOf(x)).filter(x=>x>=0)[0];const q=qty(text,['kg','kgs','tons?','quintal']);r.push({category:'Material',name:'Steel',quantity:q,unit:q!==null?'kg':'',amount:amountAfter(money,i)})}
  if(has('labour','labor','mazdoor','worker','workers','मजदूर')){const i=['labour','labor','mazdoor','worker','workers','मजदूर'].map(x=>text.indexOf(x)).filter(x=>x>=0)[0];const q=qty(text,['mazdoor(?:on)?','workers?','labou?r']);r.push({category:'Labour',name:'Labour',quantity:q,unit:q!==null?'workers':'',amount:amountAfter(money,i)})}
  if(has('truck','transport','tempo','tractor','delivery','gaadi','vehicle')){const i=['truck','transport','tempo','tractor','delivery','gaadi','vehicle'].map(x=>text.indexOf(x)).filter(x=>x>=0)[0];const a=amountAfter(money,i);if(a)r.push({category:'Transport',name:'Transport',quantity:null,unit:'',amount:a})}
  if(has('machine','equipment','excavator','jcb','mixer')){const i=['machine','equipment','excavator','jcb','mixer'].map(x=>text.indexOf(x)).filter(x=>x>=0)[0];const a=amountAfter(money,i);if(a)r.push({category:'Equipment',name:'Equipment',quantity:null,unit:'',amount:a})}
- const pm=text.match(/(\d+(?:\.\d+)?)\s*(ft|feet|meter|metre|m)\b/i);if(pm&&has('pcc','complete','completed','road','work'))r.push({category:'Daily Progress',name:'Daily Progress',quantity:Number(pm[1]),unit:pm[2],amount:0});
- if(!r.length){if(money.length)r.push({category:'Miscellaneous',name:'Miscellaneous Expense',quantity:null,unit:'',amount:money.reduce((s,m)=>s+m.value,0)});else{showError('I could not identify an expense or progress entry. Try: 40 bag cement ₹18,000 and truck ₹2,500');return}}
+ const pm=text.match(/(\d+(?:\.\d+)?)\s*(ft|feet|meter|metre|m)\b/i);if(pm&&(has('pcc','road','complete','completed','progress'))){r.push({category:'Daily Progress',name:'Daily Progress',quantity:Number(pm[1]),unit:pm[2],amount:0})}
+ if(!r.length){if(money.length)r.push({category:'Miscellaneous',name:'Miscellaneous Expense',quantity:null,unit:'',amount:money.reduce((s,x)=>s+x.value,0)});else{showError('I could not identify an expense or progress entry. Try: “40 bag cement ₹18,000 and truck ₹2,500”.');return}}
  parsedEntries=r;renderParsed();
 }
 function renderParsed(){const box=document.getElementById('parsedEntries');box.innerHTML='';let total=0;parsedEntries.forEach(e=>{total+=Number(e.amount||0);const d=document.createElement('div');d.className='parsed-entry';const q=e.quantity!==null?e.quantity+' '+e.unit:'';d.innerHTML='<div><div class="entry-name">'+esc(e.name)+'</div><div class="entry-meta">'+esc(e.category)+(q?' • '+esc(q):'')+'</div></div><div class="entry-amount">'+(e.amount?rupees(e.amount):'Progress')+'</div>';box.appendChild(d)});document.getElementById('parsedTotal').textContent=rupees(total);document.getElementById('parsedBox').classList.add('show')}
-function saveParsedEntries(){const project=document.getElementById('projectSelect').value;let saved=JSON.parse(localStorage.getItem('buildtrack_entries')||'[]');const fresh=parsedEntries.map(e=>({...e,project,date:today(),id:Date.now()+Math.random()}));saved=[...fresh,...saved];localStorage.setItem('buildtrack_entries',JSON.stringify(saved));const extra=fresh.reduce((s,e)=>s+Number(e.amount||0),0);localStorage.setItem('buildtrack_extra_spent',Number(localStorage.getItem('buildtrack_extra_spent')||0)+extra);updateDashboard();renderSaved();renderRecent();document.getElementById('aiInput').value='';document.getElementById('parsedBox').classList.remove('show');parsedEntries=[];alert('✓ Entry saved successfully!')}
+function saveParsedEntries(){const project=document.getElementById('projectSelect').value;let saved=JSON.parse(localStorage.getItem('buildtrack_entries')||'[]');const items=parsedEntries.map(e=>({...e,project,date:today(),id:Date.now()+Math.random()}));saved=[...items,...saved];localStorage.setItem('buildtrack_entries',JSON.stringify(saved));const extra=Number(localStorage.getItem('buildtrack_extra_spent')||0)+items.reduce((s,e)=>s+Number(e.amount||0),0);localStorage.setItem('buildtrack_extra_spent',extra);updateDashboard();renderSaved();renderRecent();document.getElementById('aiInput').value='';document.getElementById('parsedBox').classList.remove('show');parsedEntries=[];alert('✓ Entry saved successfully!')}
 function updateDashboard(){const total=INITIAL_SPENT+Number(localStorage.getItem('buildtrack_extra_spent')||0);document.getElementById('totalSpent').textContent=compact(total);document.getElementById('remaining').textContent=compact(Math.max(0,CONTRACT_VALUE-total))}
-function renderSaved(){const c=document.getElementById('savedEntries'),s=JSON.parse(localStorage.getItem('buildtrack_entries')||'[]');if(!s.length){c.innerHTML='<div class="empty">No new AI entries saved yet.</div>';return}c.innerHTML=s.slice(0,10).map(e=>'<div class="saved-entry"><div><div class="saved-name">'+esc(e.name)+'</div><div class="saved-meta">'+esc(e.project)+' • '+esc(e.date)+(e.quantity!==null?' • '+esc(e.quantity+' '+e.unit):'')+'</div></div><div class="money">'+(e.amount?rupees(e.amount):'Progress')+'</div></div>').join('')}
-function renderRecent(){const c=document.getElementById('recentExpenses'),s=JSON.parse(localStorage.getItem('buildtrack_entries')||'[]').filter(e=>Number(e.amount)>0);if(!s.length)return;c.innerHTML=s.slice(0,5).map(e=>'<div class="project"><div><h3>'+esc(e.name)+'</h3><div class="meta">'+esc(e.project)+' • '+esc(e.date)+'</div></div><div class="money">'+rupees(e.amount)+'</div></div>').join('')}
+function renderSaved(){const box=document.getElementById('savedEntries'),saved=JSON.parse(localStorage.getItem('buildtrack_entries')||'[]');if(!saved.length){box.innerHTML='<div class="empty">No new AI entries saved yet.</div>';return}box.innerHTML=saved.slice(0,10).map(e=>'<div class="saved-entry"><div><div class="saved-name">'+esc(e.name)+'</div><div class="saved-meta">'+esc(e.project)+' • '+esc(e.date)+(e.quantity!==null?' • '+esc(e.quantity+' '+e.unit):'')+'</div></div><div class="money">'+(e.amount?rupees(e.amount):'Progress')+'</div></div>').join('')}
+function renderRecent(){const box=document.getElementById('recentExpenses'),saved=JSON.parse(localStorage.getItem('buildtrack_entries')||'[]').filter(e=>Number(e.amount)>0);if(!saved.length)return;box.innerHTML=saved.slice(0,5).map(e=>'<div class="project"><div><h3>'+esc(e.name)+'</h3><div class="meta">'+esc(e.project)+' • '+esc(e.date)+'</div></div><div class="money">'+rupees(e.amount)+'</div></div>').join('')}
 function cancelParsedEntry(){parsedEntries=[];document.getElementById('parsedBox').classList.remove('show')}
-function newProject(){alert('Project creation module is next.')} 
-document.getElementById('aiInput').addEventListener('keydown',e=>{if(e.key==='Enter')parseEntry()});updateDashboard();renderSaved();renderRecent();
+function newProject(){alert('Project creation module is next. We will connect it to the database after the AI Entry system.')}
+document.getElementById('aiInput').addEventListener('keydown',e=>{if(e.key==='Enter')parseEntry()});
+updateDashboard();renderSaved();renderRecent();
 </script>
 </body>
 </html>
